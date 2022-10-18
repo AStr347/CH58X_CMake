@@ -1,0 +1,26 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "gdb-openocd",
+            "type": "gdb",
+            "request": "attach",
+            "executable": "build/CH582M.elf",
+            "remote": true,
+            "target": ":3333",
+            "cwd": "${workspaceRoot}",
+            "gdbpath": "${config:gdbdir}/riscv-none-embed-gdb.exe",
+            "preLaunchTask": "run_openocd",
+            "autorun": [
+                "set mem inaccessible-by-default off",
+                "set architecture riscv:rv32",
+                "set remotetimeout unlimited",
+                "monitor reset halt",
+                "load"
+            ]
+        },
+    ]
+}
