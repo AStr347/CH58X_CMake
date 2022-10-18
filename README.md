@@ -41,4 +41,4 @@ Add to 'cmake-tool-kits.json' all parts of compiler like this:
 }
 ```
 
-Configure and build project throught 'CMake Tools' extension
+Configure and build project through 'CMake Tools' extension
