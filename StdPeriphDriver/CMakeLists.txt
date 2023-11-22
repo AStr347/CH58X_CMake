@@ -13,10 +13,9 @@ add_subdirectory(usbdev)
 add_subdirectory(usbhost)
 
 SLIB_INIT(
-    LNAME CH58XPeriphDriver
     SRCS    common/core_riscv.c
     INCLUDE common/include
-    PUB_REQ libISP583.a Adc Clk Flash Gpio I2c Pwm Pwr Spi Sys Timer Uart UsbDev UsbHost
+    PUB_REQ libISP583.a adc clk flash gpio i2c pwm pwr spi sys timer uart usbdev usbhost
 )
 
-target_link_directories(CH58XPeriphDriver PUBLIC common)
+target_link_directories(StdPeriphDriver PUBLIC common)

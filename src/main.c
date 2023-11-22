@@ -1,79 +1,73 @@
 /********************************** (C) COPYRIGHT *******************************
- * File Name          : Main.c
+ * File Name          : main.c
  * Author             : WCH
  * Version            : V1.0
  * Date               : 2020/08/06
- * Description        : 1շʾ
+ * Description        : �㲥Ӧ��������������ϵͳ��ʼ��
  * Copyright (c) 2021 Nanjing Qinheng Microelectronics Co., Ltd.
  * SPDX-License-Identifier: Apache-2.0
  *******************************************************************************/
 
-#include "CH58x_common.h"
-
-uint8_t TxBuff[] = "This is a tx exam\r\n";
-uint8_t RxBuff[100];
-uint8_t trigB;
+/******************************************************************************/
+/* ͷ�ļ����� */
+#include "config.h"
+#include "HAL.h"
+#include "broadcaster.h"
 
 /*********************************************************************
- * @fn      main
- *
- * @brief   
- *
- * @return  none
+ * GLOBAL TYPEDEFS
  */
-int main()
+__attribute__((aligned(4))) u32 MEM_BUF[BLE_MEMHEAP_SIZE / 4];
+
+#if(defined(BLE_MAC)) && (BLE_MAC == TRUE)
+u8C MacAddr[6] = {0x84, 0xC2, 0xE4, 0x03, 0x02, 0x02};
+#endif
+
+/*******************************************************************************
+ * Function Name  : Main_Circulation
+ * Description    : ��ѭ��
+ * Input          : None
+ * Output         : None
+ * Return         : None
+ *******************************************************************************/
+__HIGH_CODE
+__attribute__((noinline))
+void Main_Circulation()
 {
-    SetSysClock(CLK_SOURCE_PLL_60MHz);
-
-    GPIOA_SetBits(GPIO_Pin_9);
-    GPIOA_ModeCfg(GPIO_Pin_8, GPIO_ModeIN_PU);
-    GPIOA_ModeCfg(GPIO_Pin_9, GPIO_ModeOut_PP_5mA);
-    UART1_DefInit();
-
-    UART1_SendString(TxBuff, sizeof(TxBuff));
     while(1)
     {
-        const uint8_t len = UART1_RecvString(RxBuff);
-        if(0 != len) {
-            UART1_SendString(RxBuff, len);
-        }
+        TMOS_SystemProcess();
     }
-
-    while(1);
 }
 
-/*********************************************************************
- * @fn      UART1_IRQHandler
- *
- * @brief   UART1жϺ
- *
- * @return  none
- */
-__INTERRUPT
-__HIGH_CODE
-void UART1_IRQHandler(void)
+/*******************************************************************************
+ * Function Name  : main
+ * Description    : ������
+ * Input          : None
+ * Output         : None
+ * Return         : None
+ *******************************************************************************/
+int main(void)
 {
-    const uint8_t flag = UART1_GetITFlag();
-    switch(flag)
-    {
-        case UART_II_LINE_STAT: {
-            UART1_GetLinSTA();
-        } break;
-
-        case UART_II_RECV_RDY: {
-            for(uint8_t i = 0; i != trigB; i++)
-            {
-                RxBuff[i] = UART1_RecvByte();
-                UART1_SendByte(RxBuff[i]);
-            }
-        } break;
-
-        case UART_II_RECV_TOUT: {
-            const uint8_t len = UART1_RecvString(RxBuff);
-            UART1_SendString(RxBuff, len);
-        } break;
-
-        default:
-            break;
-    }
+#if(defined(DCDC_ENABLE)) && (DCDC_ENABLE == TRUE)
+    PWR_DCDCCfg(ENABLE);
+#endif
+    SetSysClock(CLK_SOURCE_PLL_60MHz);
+#if(defined(HAL_SLEEP)) && (HAL_SLEEP == TRUE)
+    GPIOA_ModeCfg(GPIO_Pin_All, GPIO_ModeIN_PU);
+    GPIOB_ModeCfg(GPIO_Pin_All, GPIO_ModeIN_PU);
+#endif
+#ifdef DEBUG
+    GPIOA_SetBits(bTXD1);
+    GPIOA_ModeCfg(bTXD1, GPIO_ModeOut_PP_5mA);
+    UART1_DefInit();
+#endif
+    PRINT("%s\n", VER_LIB);
+    CH58X_BLEInit();
+    HAL_Init();
+    GAPRole_BroadcasterInit();
+    Broadcaster_Init();
+    Main_Circulation();
 }
+
+/******************************** endfile @ main ******************************/

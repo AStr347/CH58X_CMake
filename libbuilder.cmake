@@ -1,6 +1,6 @@
 #! func for create static lib
 # \flag:LOG         - [optional]    if set func print other data 
-# \param:LNAME      - [must]        static lib name
+# \param:LNAME      - [optional]    static lib name, if not defined set like folder name
 # \group:SRCS       - [must]        source of lib
 # \group:INCLUDE    - [optional]    path to headers
 # \group:PRIV_REQ   - [optional]    private libs req
@@ -8,40 +8,52 @@
 #
 function(SLIB_INIT)
     cmake_parse_arguments(
-        SLIB_INIT_PREFIX
+        slib
         "LOG"
         "LNAME"
         "SRCS;INCLUDE;PRIV_REQ;PUB_REQ"
         ${ARGN}
     )
     # check LNAME and SRCS exist
-    if(NOT DEFINED SLIB_INIT_PREFIX_LNAME)
-        message(FATAL_ERROR "lib name must be defined")
+    if(NOT DEFINED slib_LNAME)
+        get_filename_component(slib_LNAME ${CMAKE_CURRENT_LIST_DIR} NAME)
+        # message(FATAL_ERROR "lib name must be defined")
     endif()
-    if(NOT DEFINED SLIB_INIT_PREFIX_SRCS)
+    if(NOT DEFINED slib_SRCS)
         message(FATAL_ERROR "lib sources must be defined")
     endif()
 
-    if(SLIB_INIT_PREFIX_LOG)
+    if(slib_LOG)
         message("\n")
-        message("LNAME:\t" ${SLIB_INIT_PREFIX_LNAME})
-        message("SRCS:\t" ${SLIB_INIT_PREFIX_SRCS})
-        message("INCLUDE:\t" ${SLIB_INIT_PREFIX_INCLUDE})
-        message("PRIV_REQ:\t" ${SLIB_INIT_PREFIX_PRIV_REQ})
-        message("PUB_REQ:\t" ${SLIB_INIT_PREFIX_PUB_REQ})
+        message("LNAME:\t" ${slib_LNAME})
+        message("SRCS:\t" ${slib_SRCS})
+        message("INCLUDE:\t" ${slib_INCLUDE})
+        message("PRIV_REQ:\t" ${slib_PRIV_REQ})
+        message("PUB_REQ:\t" ${slib_PUB_REQ})
         message("\n")
     endif()
 
-    add_library(${SLIB_INIT_PREFIX_LNAME} STATIC ${SLIB_INIT_PREFIX_SRCS})# Create static lib
-    if(DEFINED SLIB_INIT_PREFIX_INCLUDE)
+    add_library(${slib_LNAME} STATIC ${slib_SRCS})# Create static lib
+    if(DEFINED slib_INCLUDE)
         # add public include dir
-        target_include_directories(${SLIB_INIT_PREFIX_LNAME} 
-            PUBLIC ${SLIB_INIT_PREFIX_INCLUDE}
+        target_include_directories(${slib_LNAME} 
+            PUBLIC ${slib_INCLUDE}
         )
     endif()
     # link private and public libs
-    target_link_libraries(${SLIB_INIT_PREFIX_LNAME} 
-        PRIVATE ${SLIB_INIT_PREFIX_PRIV_REQ}
-        PUBLIC ${SLIB_INIT_PREFIX_PUB_REQ}
+    target_link_libraries(${slib_LNAME} 
+        PRIVATE ${slib_PRIV_REQ}
+        PUBLIC ${slib_PUB_REQ}
     )
 endfunction(SLIB_INIT)
+
+
+function(SUBDIRS)
+    foreach(spath IN ITEMS ${ARGN})
+        # message(STATUS ${spath})
+        file(GLOB subsubdirs RELATIVE_PATH ${spath}/*)
+        foreach(subdirs IN ITEMS ${subsubdirs})
+            add_subdirectory(${subdirs})
+        endforeach()
+    endforeach()
+endfunction(SUBDIRS)

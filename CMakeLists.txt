@@ -11,7 +11,11 @@ add_executable(${PROJECT_NAME}.elf src/main.c)
 
 add_subdirectory(StdPeriphDriver)
 add_subdirectory(Startup)
-target_link_libraries(${PROJECT_NAME}.elf Startup CH58XPeriphDriver)
+add_subdirectory(LIB)
+add_subdirectory(HAL)
+add_subdirectory(Profile)
+add_subdirectory(broadcaster)
+target_link_libraries(${PROJECT_NAME}.elf Startup StdPeriphDriver LIB HAL Profile broadcaster)
 
 add_custom_target(BIN ALL
     COMMAND ${CMAKE_OBJCOPY_COMPILER} -O ihex ${PROJECT_NAME}.elf ${PROJECT_NAME}.hex

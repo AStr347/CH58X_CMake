@@ -1,4 +1,5 @@
 {
+    "projname": "CH582M",
     "openocddir":"C:/work/SDK/WCH/MounRiver/MRS_Community/toolchain/OpenOCD/bin",
     "gdbdir":"C:\\work\\SDK\\WCH\\MounRiver\\MRS_Community\\toolchain\\RISC-V Embedded GCC\\bin"
 }

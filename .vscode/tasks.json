@@ -48,7 +48,7 @@
             "args": [
                 "-f",
                 "${config:openocddir}/wch-riscv.cfg",
-                "-c \"program build/CH582M.hex\"",
+                "-c \"program build/${config:projname}.hex\"",
                 "-c exit"
             ],
             "problemMatcher": [
