@@ -1,5 +1,7 @@
 # CH58X CMake
 
+build example from [openwch](https://github.com/openwch/ch583) by CMake
+
 ## Instruments
 
 * CMake 3.25.0
